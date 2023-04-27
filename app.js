@@ -6,15 +6,22 @@ let app = express();
 let connection = require("./db");
 
 app.use(bodyParser.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    // origin: ["https://www.google.com"], // add here the origin url for trusted origin
+  })
+);
+
 app.use(
   bodyParser.urlencoded({
     extended: false,
   })
 );
 
-app.listen(3001, function () {
-  console.log("app was listen on 3001 port");
+app.listen(3000, function () {
+  // server are listen on 3001 port
+  console.log("app was listen on 3000 port");
   connection.connect(function (err) {
     if (err) throw err;
     console.log("Database Connected");
@@ -27,23 +34,26 @@ app.get("/", function (req, res) {
   );
 });
 
-app.get("/examData", function (req, res) {
-  let sql = "SELECT * FROM marks";
+app.get("/examarks", function (req, res) {
+  // get all the data from the database
+  let sql = "SELECT * FROM marks_master";
   connection.query(sql, function (err, results) {
     if (err) throw err;
     res.send(results);
   });
 });
 
-app.get("/examData/id=:id", function (req, res) {
-  let sql = "SELECT * FROM marks WHERE id = ?";
+app.get("/examarks/id=:id", function (req, res) {
+  // get only one data by their id value
+  let sql = "SELECT * FROM marks_master WHERE id = ?";
   connection.query(sql, [req.params.id], function (err, results, fields) {
     if (err) throw err;
     res.send(results);
   });
 });
 
-app.post("/insertData", function (req, res) {
+app.post("/insert", function (req, res) {
+  // insert data into the table
   let name = req.body.name;
   let classData = req.body.class;
   let subject = req.body.subject;
@@ -52,10 +62,9 @@ app.post("/insertData", function (req, res) {
   let date = req.body.date;
   let remarks = req.body.remarks;
   let total_marks = req.body.total_marks;
-  let idString = req.body.idString;
 
   let sql =
-    "INSERT INTO `examarks-tnr`.`marks` (`name`, `class`, `subject`, `test_name`, `marks`, `date`, `remarks`, `total_marks` , `idString`) VALUES ('" +
+    "INSERT INTO `examarks-tnr`.`marks_master` (`name`, `class`, `subject`, `test_name`, `marks`, `date`, `remarks`, `total_marks`) VALUES ('" +
     name +
     "', '" +
     classData +
@@ -71,62 +80,61 @@ app.post("/insertData", function (req, res) {
     remarks +
     "', '" +
     total_marks +
-    "' , '" +
-    idString +
     "')";
   connection.query(sql, function (err, results) {
     if (err) throw err;
     // res.send(results);
     res.send("data was added");
+    console.log("data was added");
   });
 });
 
-app.put("/updateData", function (req, res) {
-  let id = req.body.id;
-  let name = req.body.name;
-  let classData = req.body.class;
-  let subject = req.body.subject;
-  let test_name = req.body.test_name;
-  let marks = req.body.marks;
-  let date = req.body.date;
-  let remarks = req.body.remarks;
-  let total_marks = req.body.total_marks;
-  let idString = req.body.idString;
-
-  let sql =
-    "UPDATE `marks` SET  `name`= '" +
-    name +
-    "', `class`= '" +
-    classData +
-    "',  `subject`= '" +
-    subject +
-    "',  `test_name`= '" +
-    test_name +
-    "',  `marks`= '" +
-    marks +
-    "',  `date`= '" +
-    date +
-    "',  `remarks`= '" +
-    remarks +
-    "',  `total_marks` ='" +
-    total_marks +
-    "',  `idString` ='" +
-    idString +
-    "' WHERE `id` = '" +
-    id +
-    "' ";
-
-  // UPDATE `examarks-tnr`.`marks` SET `name` = 'Himanshu' WHERE (`id` = '2');
-  connection.query(sql, function (err, results) {
-    if (err) throw err;
+app.put("/update/id=:id", async function (req, res) {
+  let sql = "UPDATE `marks_master` SET ? WHERE `marks_master`.`id` = ? "; 
+  await connection.query(sql , [req.body , req.params.id] ,function(err , results) {
+    if(err) throw err;
     res.send(results);
   });
 });
 
-app.delete("/deleteData/id=:id", function (req, res) {
-  let sql = "DELETE FROM `marks` WHERE id = ?";
+app.delete("/delete/id=:id", function (req, res) {
+  // delete data from table
+  let sql = "DELETE FROM `marks_master` WHERE id = ?";
   connection.query(sql, [req.params.id], function (err, results) {
     if (err) throw err;
     res.send(results);
   });
 });
+
+
+  // let findId =
+  //   "SELECT id FROM `examarks-tnr`.`marks_master` WHERE idString = '" +
+  //   req.body.idString +
+  //   "'";
+  // // let sql = "UPDATE `marks` SET ? WHERE `marks`.`id` = " + findId + "";
+  // let getId = 0;
+  // await connection.query(findId, [req.body], function (err, results) {
+  //   if (err) throw err;
+  //   if (results == undefined) {
+  //     res.send("unknown id was detected");
+  //   } else {
+  //     let id = results;
+  //     console.log("id :: ", id);
+  //     getId = id[0].id;
+  //     updateData(getId, req.body);
+  //     res.send("data are updated");
+  //   }
+  // });
+
+  // console.log(getId);
+
+// function updateData(id, data) {
+//   if (id != 0) {
+//     let sql = "UPDATE `marks_master` SET ? WHERE `marks_master`.`id` = " + id + "";
+//     connection.query(sql, data, function (err, results) {
+//       if (err) throw err;
+//       // res.send("data are updated");
+//       console.log("data are updated");
+//     });
+//   }
+// }
