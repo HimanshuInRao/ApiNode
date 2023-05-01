@@ -60,4 +60,12 @@ let deleteData = (req, res, next) => {
   });
 };
 
-module.exports = { getData, getDataById, insertData, updateData, deleteData };
+let getDataByName = (req, res, next) => {
+  let sql = "SELECT id FROM `examarks-tnr`.classes WHERE classes.class = ?";
+  connection.query(sql , [req.params.name] , (err , result) => {
+    if (err) throw err;
+    res.send(result); 
+  })
+};
+
+module.exports = { getData, getDataById, insertData, updateData, deleteData , getDataByName };

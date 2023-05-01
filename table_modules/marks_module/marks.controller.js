@@ -23,6 +23,7 @@ let getDataById = (req, res, next) => {
 // route.post("/insert",
 let insertData = (req, res, next) => {
   // insert data into the table
+  let studentId = req.body.s_id;
   let name = req.body.name;
   let classData = req.body.class;
   let subject = req.body.subject;
@@ -33,7 +34,9 @@ let insertData = (req, res, next) => {
   let total_marks = req.body.total_marks;
 
   let sql =
-    "INSERT INTO `examarks-tnr`.`marks_master` (`name`, `class`, `subject`, `test_name`, `marks`, `date`, `remarks`, `total_marks`) VALUES ('" +
+    "INSERT INTO `examarks-tnr`.`marks_master` (`s_id` , `name`, `class`, `subject`, `test_name`, `marks`, `date`, `remarks`, `total_marks`) VALUES ('" +
+    studentId +
+    "','" +
     name +
     "', '" +
     classData +
@@ -94,4 +97,11 @@ let selectTimeData = (req, res, next) => {
 // updateData ,
 // deleteData
 
-module.exports = { getData, getDataById, insertData, updateData, deleteData , selectTimeData};
+module.exports = {
+  getData,
+  getDataById,
+  insertData,
+  updateData,
+  deleteData,
+  selectTimeData,
+};
