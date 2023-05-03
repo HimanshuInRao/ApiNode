@@ -10,6 +10,14 @@ let getData = (req, res, next) => {
   });
 };
 
+let getStudentByID = (req , res , next) => {
+  let sql = "SELECT * FROM students WHERE id = ?";
+  connection.query(sql, [req.params.id], function (err, results, fields) {
+    if (err) throw err;
+    res.send(results);
+  });
+}
+
 // route.get("/examarks/id=:id",
 let getDataByClassId = (req, res, next) => {
   // get only one data by their id value
@@ -72,4 +80,5 @@ module.exports = {
   insertData,
   updateData,
   deleteData,
+  getStudentByID,
 };

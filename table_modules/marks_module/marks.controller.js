@@ -1,4 +1,5 @@
 let connection = require("../../database/db-config");
+const { param } = require("../../routes-files/marks.routes");
 
 // route.get("/examarks"
 let getData = (req, res, next) => {
@@ -92,6 +93,65 @@ let selectTimeData = (req, res, next) => {
   });
 };
 
+let selectByClass = (req, res, next) => {
+  let sql = "SELECT * FROM marks_master WHERE class = ?";
+  connection.query(sql, [req.params.class], function (err, results) {
+    if (err) throw err;
+    res.send(results);
+  });
+};
+
+let selectByClassSub = (req, res, next) => {
+  // let className = req.body.class;
+  // let subjectName = req.body.subject;
+  let sql =
+    "SELECT * FROM `examarks-tnr`.marks_master where class = '" +
+    req.params.class +
+    "' AND subject = '" +
+    req.params.subject +
+    "'";
+  connection.query(sql, [req.params.class , req.params.subject], function (err, results) {
+    if (err) throw err;
+    res.send(results);
+  });
+};
+
+let selectByClassSubTest = (req, res, next) => {
+  let className = req.body.class;
+  let subjectName = req.body.subject;
+  let testName = req.body.test_name;
+  let sql =
+    "SELECT * FROM `examarks-tnr`.marks_master where class = '" +
+    req.params.class +
+    "' AND subject='" +
+    req.params.subject +
+    "' AND test_name='" +
+    req.params.test_name +
+    "'";
+  connection.query(sql, [req.params.class ,req.params.subject , req.params.test_name], function (err, results) {
+    if (err) throw err;
+    res.send(results);
+  });
+};
+
+let selectTime = (req, res, next) => {  
+  let sql =
+    "SELECT remarks FROM `examarks-tnr`.marks_master";
+  connection.query(sql, function (err, results) {
+    if (err) throw err;
+    res.send(results);
+  });
+};
+
+let getTimeByClass = (req, res, next) => {  
+  let classId = req.body.class
+  let sql =
+    "SELECT remarks FROM `examarks-tnr`.marks_master where class = '"+ classId +"' ";
+  connection.query(sql , [req.body] , function (err, results) {
+    if (err) throw err;
+    res.send(results);
+  });
+};
 // getDataById ,
 // insertData ,
 // updateData ,
@@ -104,4 +164,9 @@ module.exports = {
   updateData,
   deleteData,
   selectTimeData,
+  selectByClass,
+  selectByClassSub,
+  selectByClassSubTest,
+  selectTime,
+  getTimeByClass,
 };
